@@ -1,0 +1,94 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+
+#define INF INT_MAX
+
+// Structure to represent a weighted edge in the graph
+struct Edge {
+    int src, dest, weight;
+};
+
+// Structure to represent a directed, weighted graph
+struct Graph {
+    int V, E;
+    struct Edge* edges;
+};
+
+// Function to create a new graph with V vertices and E edges
+struct Graph* createGraph(int V, int E) {
+    struct Graph* graph = (struct Graph*) malloc(sizeof(struct Graph));
+    graph->V = V;
+    graph->E = E;
+    graph->edges = (struct Edge*) malloc(E * sizeof(struct Edge));
+    return graph;
+}
+
+// Function to print the solution
+void printPath(int dist[], int parent[], int n, int src, int dest) {
+    if (src == dest) {
+        printf("%d ", src);
+        return;
+    }
+    if (parent[dest] == -1) {
+        printf("No Path Exists\n");
+        return;
+    }
+    printPath(dist, parent, n, src, parent[dest]);
+    printf("%d ", dest);
+}
+
+// Function to implement Bellman-Ford's algorithm to find shortest path from source to all vertices
+void bellmanFord(struct Graph* graph, int src) {
+    int V = graph->V;
+    int E = graph->E;
+    int dist[V];
+    int parent[V];
+    for (int i = 0; i < V; i++) {
+        dist[i] = INF;
+        parent[i] = -1;
+    }
+    dist[src] = 0;
+    for (int i = 0; i < V - 1; i++) {
+        for (int j = 0; j < E; j++) {
+            int u = graph->edges[j].src;
+            int v = graph->edges[j].dest;
+            int weight = graph->edges[j].weight;
+            if (dist[u] != INF && dist[u] + weight < dist[v]) {
+                dist[v] = dist[u] + weight;
+                parent[v] = u;
+            }
+        }
+    }
+    // Check for negative-weight cycles
+    for (int j = 0; j < E; j++) {
+        int u = graph->edges[j].src;
+        int v = graph->edges[j].dest;
+        int weight = graph->edges[j].weight;
+        if (dist[u] != INF && dist[u] + weight < dist[v]) {
+            printf("Negative weight cycle exists\n");
+            return;
+        }
+    }
+    // Print shortest path and distance from source to all vertices
+    for (int i = 0; i < V; i++) {
+        if (i != src) {
+            printf("%d ", dist[i]);
+            printPath(dist, parent, V, src, i);
+            printf("\n");
+        }
+    }
+}
+
+// Driver program to test above functions
+int main() {
+    int V, E, src;
+    printf("Enter the number of vertices in the graph: ");
+    scanf("%d", &V);
+    printf("Enter the number of edges in the graph: ");
+    scanf("%d", &E);
+    struct Graph* graph = createGraph(V, E);
+    for (int i = 0; i < E; i++) {
+        int src, dest, weight;
+        printf("Enter edge %d (source, destination, weight): ", i + 1);
+        scanf("%d %d %d", &src, &dest, &weight);
