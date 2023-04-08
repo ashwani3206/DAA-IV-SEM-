@@ -1,0 +1,87 @@
+#include <stdio.h>
+#include <stdbool.h>
+
+#define MAX 100
+
+int adj[MAX][MAX];
+int color[MAX];
+int visited[MAX];
+int queue[MAX];
+int front = -1, rear = -1;
+
+// BFS function to check if the graph is bipartite
+bool BFS(int start, int n)
+{
+    visited[start] = 1; // mark the start vertex as visited
+    color[start] = 0; // assign color 0 to start vertex
+
+    queue[++rear] = start; // insert the start vertex into the queue
+
+    while(front != rear) // while the queue is not empty
+    {
+        int u = queue[++front]; // remove the vertex at front of the queue
+        for(int v = 0; v < n; v++) // for all adjacent vertices of u
+        {
+            if(adj[u][v] == 1 && visited[v] == 0) // if there is an edge between u and v and v is not visited
+            {
+                visited[v] = 1; // mark v as visited
+                color[v] = !color[u]; // assign opposite color to v than its parent u
+                queue[++rear] = v; // insert v into the queue
+            }
+            else if(adj[u][v] == 1 && color[u] == color[v]) // if u and v are adjacent and have the same color
+            {
+                return false; // graph is not bipartite
+            }
+        }
+    }
+    return true; // graph is bipartite
+}
+
+int main()
+{
+    int n;
+    printf("Enter the number of vertices: ");
+    scanf("%d", &n);
+
+    printf("Enter the adjacency matrix:\n");
+    for(int i = 0; i < n; i++)
+    {
+        for(int j = 0; j < n; j++)
+        {
+            scanf("%d", &adj[i][j]);
+        }
+    }
+
+    // initialize visited and color arrays to 0
+    for(int i = 0; i < n; i++)
+    {
+        visited[i] = 0;
+        color[i] = -1;
+    }
+
+    bool isBipartite = true;
+
+    for(int i = 0; i < n; i++)
+    {
+        if(visited[i] == 0) // if the vertex i is not visited
+        {
+            front = rear = -1; // initialize the queue
+            isBipartite = BFS(i, n); // check if the connected component containing i is bipartite
+            if(isBipartite == false) // if the connected component is not bipartite
+            {
+                break; // exit the loop
+            }
+        }
+    }
+
+    if(isBipartite)
+    {
+        printf("Yes Bipartite");
+    }
+    else
+    {
+        printf("Not Bipartite");
+    }
+
+    return 0;
+}
