@@ -1,0 +1,56 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Function to sort the array using quicksort algorithm
+void quicksort(int arr[], int low, int high) {
+    if (low < high) {
+        int pivot = arr[high];
+        int i = low - 1;
+        for (int j = low; j <= high - 1; j++) {
+            if (arr[j] < pivot) {
+                i++;
+                int temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+            }
+        }
+        int temp = arr[i + 1];
+        arr[i + 1] = arr[high];
+        arr[high] = temp;
+
+        int pi = i + 1;
+
+        quicksort(arr, low, pi - 1);
+        quicksort(arr, pi + 1, high);
+    }
+}
+
+// Function to check if duplicates are present in the array
+int checkDuplicates(int arr[], int n) {
+    quicksort(arr, 0, n - 1); // sort the array using quicksort
+    for (int i = 0; i < n - 1; i++) {
+        if (arr[i] == arr[i + 1]) {
+            return 1; // duplicates present
+        }
+    }
+    return 0; // no duplicates present
+}
+
+int main() {
+    int t;
+    scanf("%d", &t); // input number of test cases
+    while (t--) {
+        int n;
+        scanf("%d", &n); // input size of array
+        int arr[n];
+        for (int i = 0; i < n; i++) {
+            scanf("%d", &arr[i]); // input array elements
+        }
+        if (checkDuplicates(arr, n)) {
+            printf("YES\n"); // duplicates present
+        } else {
+            printf("NO\n"); // no duplicates present
+        }
+    }
+    return 0;
+}
