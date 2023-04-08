@@ -1,0 +1,83 @@
+#include <stdio.h>
+#include <stdbool.h>
+
+#define MAX 100
+
+int adj[MAX][MAX];
+int visited[MAX];
+int recStack[MAX]; // stack to keep track of recursion stack
+int vertices;
+
+// DFS function to check if the graph has a cycle
+bool DFS(int v)
+{
+    visited[v] = 1; // mark the current vertex as visited
+    recStack[v] = 1; // push the current vertex to the recursion stack
+
+    for(int i = 0; i < vertices; i++) // for all adjacent vertices of v
+    {
+        if(adj[v][i] == 1) // if there is an edge from v to i
+        {
+            if(visited[i] == 0) // if i is not visited
+            {
+                if(DFS(i)) // recursive call for i
+                {
+                    return true; // cycle exists in the graph
+                }
+            }
+            else if(recStack[i] == 1) // if i is already in the recursion stack
+            {
+                return true; // cycle exists in the graph
+            }
+        }
+    }
+    recStack[v] = 0; // pop the vertex v from the recursion stack
+    return false; // no cycle in the graph
+}
+
+int main()
+{
+    printf("Enter the number of vertices: ");
+    scanf("%d", &vertices);
+
+    printf("Enter the adjacency matrix:\n");
+    for(int i = 0; i < vertices; i++)
+    {
+        for(int j = 0; j < vertices; j++)
+        {
+            scanf("%d", &adj[i][j]);
+        }
+    }
+
+    // initialize visited and recStack arrays to 0
+    for(int i = 0; i < vertices; i++)
+    {
+        visited[i] = 0;
+        recStack[i] = 0;
+    }
+
+    bool isCycle = false;
+
+    for(int i = 0; i < vertices; i++)
+    {
+        if(visited[i] == 0) // if the vertex i is not visited
+        {
+            isCycle = DFS(i); // check if there is a cycle in the connected component containing i
+            if(isCycle == true) // if a cycle is found
+            {
+                break; // exit the loop
+            }
+        }
+    }
+
+    if(isCycle == true)
+    {
+        printf("Yes Cycle Exists");
+    }
+    else
+    {
+        printf("No Cycle Exists");
+    }
+
+    return 0;
+}
