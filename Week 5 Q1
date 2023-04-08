@@ -1,0 +1,54 @@
+#include <stdio.h>
+#include <string.h>
+
+#define MAX_SIZE 26
+
+void findMaxChar(char arr[], int n)
+{
+    int count[MAX_SIZE] = {0}; // initialize the count array with 0
+
+    for(int i = 0; i < n; i++)
+    {
+        count[arr[i]-'a']++; // increment the count for the corresponding alphabet
+    }
+
+    int maxCount = 0; // variable to keep track of maximum count
+    char maxChar; // variable to keep track of alphabet with maximum count
+
+    for(int i = 0; i < MAX_SIZE; i++)
+    {
+        if(count[i] > maxCount)
+        {
+            maxCount = count[i];
+            maxChar = 'a' + i;
+        }
+    }
+
+    if(maxCount == 1)
+    {
+        printf("No Duplicates Present\n");
+    }
+    else
+    {
+        printf("%c %d\n", maxChar, maxCount);
+    }
+}
+
+int main()
+{
+    int t; // number of test cases
+    scanf("%d", &t);
+
+    while(t--)
+    {
+        int n; // size of the array
+        scanf("%d", &n);
+
+        char arr[n+1]; // input array
+        scanf("%s", arr);
+
+        findMaxChar(arr, n);
+    }
+
+    return 0;
+}
