@@ -1,0 +1,61 @@
+#include<stdio.h>
+
+#define MAX 100
+
+int adj[MAX][MAX];
+int visited[MAX];
+
+// DFS function to check if path exists
+void DFS(int v, int dest, int n)
+{
+    visited[v] = 1; // mark the current vertex as visited
+    if(v == dest) // if destination vertex is found, print 'Yes Path Exists' and return
+    {
+        printf("Yes Path Exists");
+        return;
+    }
+    for(int i = 0; i < n; i++)
+    {
+        if(adj[v][i] == 1 && visited[i] == 0) // if there is an edge between the current vertex and i and i is not visited
+        {
+            DFS(i, dest, n); // recursively call DFS function for i
+        }
+    }
+}
+
+int main()
+{
+    int n, src, dest;
+    printf("Enter the number of vertices: ");
+    scanf("%d", &n);
+
+    printf("Enter the adjacency matrix:\n");
+    for(int i = 0; i < n; i++)
+    {
+        for(int j = 0; j < n; j++)
+        {
+            scanf("%d", &adj[i][j]);
+        }
+    }
+
+    printf("Enter the source vertex: ");
+    scanf("%d", &src);
+
+    printf("Enter the destination vertex: ");
+    scanf("%d", &dest);
+
+    // initialize visited array to 0
+    for(int i = 0; i < n; i++)
+    {
+        visited[i] = 0;
+    }
+
+    DFS(src, dest, n);
+
+    if(visited[dest] == 0) // if destination vertex is not visited after DFS
+    {
+        printf("No Such Path Exists");
+    }
+
+    return 0;
+}
