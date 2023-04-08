@@ -1,0 +1,55 @@
+#include <stdio.h>
+#include <limits.h>
+
+#define MAX_V 100
+
+int graph[MAX_V][MAX_V];
+int dp[MAX_V][MAX_V][MAX_V];
+
+int min(int a, int b) {
+    return (a < b) ? a : b;
+}
+
+void initialize(int V) {
+    for(int i=0; i<V; i++) {
+        for(int j=0; j<V; j++) {
+            for(int k=0; k<V; k++) {
+                if(i == j) dp[i][j][k] = 0;
+                else dp[i][j][k] = graph[i][j];
+            }
+        }
+    }
+}
+
+void shortestPath(int V, int K) {
+    initialize(V);
+    for(int k=1; k<K; k++) {
+        for(int i=0; i<V; i++) {
+            for(int j=0; j<V; j++) {
+                for(int u=0; u<V; u++) {
+                    dp[i][j][k] = min(dp[i][j][k], dp[i][u][k-1] + graph[u][j]);
+                }
+            }
+        }
+    }
+}
+
+int main() {
+    int V, K, source, destination;
+    printf("Enter the number of vertices: ");
+    scanf("%d", &V);
+    printf("Enter the adjacency matrix:\n");
+    for(int i=0; i<V; i++) {
+        for(int j=0; j<V; j++) {
+            scanf("%d", &graph[i][j]);
+            if(graph[i][j] == 0) graph[i][j] = INT_MAX;
+        }
+    }
+    printf("Enter the source vertex and destination vertex: ");
+    scanf("%d %d", &source, &destination);
+    printf("Enter the value of k: ");
+    scanf("%d", &K);
+    shortestPath(V, K+1);
+    printf("The weight of the shortest path from %d to %d with exactly %d edges is: %d\n", source, destination, K, dp[source][destination][K]);
+    return 0;
+}
