@@ -1,0 +1,51 @@
+#include <stdio.h>
+
+int binarySearch(int arr[], int low, int high, int key, int* count) {
+    int mid;
+    while (low <= high) {
+        mid = low + (high - low) / 2;
+        if (arr[mid] == key) {
+            *count = 1;
+            int left = mid - 1;
+            int right = mid + 1;
+            while (left >= 0 && arr[left] == key) {
+                left--;
+                *count += 1;
+            }
+            while (right <= high && arr[right] == key) {
+                right++;
+                *count += 1;
+            }
+            return mid;
+        }
+        else if (arr[mid] < key) {
+            low = mid + 1;
+        }
+        else {
+            high = mid - 1;
+        }
+    }
+    return -1;
+}
+
+int main() {
+    int t, n, key;
+    scanf("%d", &t);
+    while (t--) {
+        scanf("%d", &n);
+        int arr[n];
+        for (int i = 0; i < n; i++) {
+            scanf("%d", &arr[i]);
+        }
+        scanf("%d", &key);
+        int count = 0;
+        int index = binarySearch(arr, 0, n - 1, key, &count);
+        if (index == -1) {
+            printf("Key not present\n");
+        }
+        else {
+            printf("%d - %d\n", key, count);
+        }
+    }
+    return 0;
+}
