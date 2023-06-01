@@ -1,40 +1,105 @@
-import sys
+#include <stdio.h>
+#include <stdlib.h>
 
-def prim_max_budget(graph, num_vertices):
-    key = [-sys.maxsize] * num_vertices
-    parent = [-1] * num_vertices
-    key[0] = 0
-    mst = set()
+#define MAX 1000
 
-    for _ in range(num_vertices):
-        max_key = -sys.maxsize
-        max_vertex = -1
+typedef struct {
+    int source;
+    int destination;
+    int weight;
+} Edge;
 
-        for v in range(num_vertices):
-            if key[v] > max_key and v not in mst:
-                max_key = key[v]
-                max_vertex = v
+typedef struct {
+    int parent;
+    int rank;
+} Subset;
 
-        mst.add(max_vertex)
+int find(Subset subsets[], int i) {
+    if (subsets[i].parent != i) {
+        subsets[i].parent = find(subsets, subsets[i].parent);
+    }
+    return subsets[i].parent;
+}
 
-        for u in range(num_vertices):
-            if graph[max_vertex][u] > key[u] and u not in mst:
-                key[u] = graph[max_vertex][u]
-                parent[u] = max_vertex
+void unionSets(Subset subsets[], int x, int y) {
+    int xroot = find(subsets, x);
+    int yroot = find(subsets, y);
 
-    max_budget = sum(graph[u][parent[u]] for u in range(1, num_vertices))
+    if (subsets[xroot].rank < subsets[yroot].rank) {
+        subsets[xroot].parent = yroot;
+    } else if (subsets[xroot].rank > subsets[yroot].rank) {
+        subsets[yroot].parent = xroot;
+    } else {
+        subsets[yroot].parent = xroot;
+        subsets[xroot].rank++;
+    }
+}
 
-    return max_budget
+int compare(const void* a, const void* b) {
+    Edge* edge1 = (Edge*)a;
+    Edge* edge2 = (Edge*)b;
+    return edge1->weight - edge2->weight;
+}
 
-# Example usage
-num_vertices = int(input("Enter the number of vertices: "))
+int maxBudget(int graph[MAX][MAX], int V) {
+    Edge edges[MAX * MAX];
 
-print("Enter the adjacency matrix:")
+    int edgeCount = 0;
+    for (int i = 0; i < V; i++) {
+        for (int j = 0; j < V; j++) {
+            if (graph[i][j] != 0) {
+                edges[edgeCount].source = i;
+                edges[edgeCount].destination = j;
+                edges[edgeCount].weight = graph[i][j];
+                edgeCount++;
+            }
+        }
+    }
 
-graph = []
-for _ in range(num_vertices):
-    row = list(map(int, input().split()))
-    graph.append(row)
+    qsort(edges, edgeCount, sizeof(Edge), compare);
 
-max_budget = prim_max_budget(graph, num_vertices)
-print("Maximum budget required for the road construction project:", max_budget)
+    Subset subsets[MAX];
+    for (int i = 0; i < V; i++) {
+        subsets[i].parent = i;
+        subsets[i].rank = 0;
+    }
+
+    int maxBudget = 0;
+    int edgeIndex = 0;
+    int addedEdges = 0;
+
+    while (addedEdges < V - 1) {
+        Edge currentEdge = edges[edgeIndex++];
+
+        int sourceParent = find(subsets, currentEdge.source);
+        int destParent = find(subsets, currentEdge.destination);
+
+        if (sourceParent != destParent) {
+            maxBudget += currentEdge.weight;
+            unionSets(subsets, sourceParent, destParent);
+            addedEdges++;
+        }
+    }
+
+    return maxBudget;
+}
+
+int main() {
+    int V;
+    printf("Enter the number of vertices in the graph: ");
+    scanf("%d", &V);
+
+    int graph[MAX][MAX];
+
+    printf("Enter the adjacency matrix:\n");
+    for (int i = 0; i < V; i++) {
+        for (int j = 0; j < V; j++) {
+            scanf("%d", &graph[i][j]);
+        }
+    }
+
+    int maxBudget = maxBudget(graph, V);
+    printf("Maximum budget required: %d\n", maxBudget);
+
+    return 0;
+}
