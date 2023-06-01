@@ -1,0 +1,67 @@
+#include <stdio.h>
+#include <stdbool.h>
+
+#define MAX 1000
+
+bool visited[MAX];
+
+void DFS(int graph[MAX][MAX], int vertex, int n) {
+    visited[vertex] = true;
+
+    for (int i = 0; i < n; i++) {
+        if (graph[vertex][i] && !visited[i]) {
+            DFS(graph, i, n);
+        }
+    }
+}
+
+int findMotherVertex(int graph[MAX][MAX], int n) {
+    int lastVisited = 0;
+
+    for (int i = 0; i < n; i++) {
+        if (!visited[i]) {
+            DFS(graph, i, n);
+            lastVisited = i;
+        }
+    }
+
+    // Reset visited array
+    for (int i = 0; i < n; i++) {
+        visited[i] = false;
+    }
+
+    DFS(graph, lastVisited, n);
+
+    for (int i = 0; i < n; i++) {
+        if (!visited[i]) {
+            return -1; // No mother vertex found
+        }
+    }
+
+    return lastVisited;
+}
+
+int main() {
+    int n;
+    printf("Enter the number of vertices in the graph: ");
+    scanf("%d", &n);
+
+    int graph[MAX][MAX];
+
+    printf("Enter the adjacency matrix:\n");
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            scanf("%d", &graph[i][j]);
+        }
+    }
+
+    int motherVertex = findMotherVertex(graph, n);
+
+    if (motherVertex == -1) {
+        printf("No mother vertex found.\n");
+    } else {
+        printf("The mother vertex is: %d\n", motherVertex);
+    }
+
+    return 0;
+}
