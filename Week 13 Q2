@@ -1,0 +1,44 @@
+#include <stdio.h>
+#include <stdbool.h>
+
+bool containsDuplicate(int arr[], int n, int k) {
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = i + 1; j <= i + k && j < n; j++) {
+            if (arr[i] == arr[j]) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+int main() {
+    int T;
+    printf("Enter the number of test cases: ");
+    scanf("%d", &T);
+
+    for (int t = 1; t <= T; t++) {
+        int n, k;
+        printf("Test case #%d\n", t);
+        printf("Enter the size of the array: ");
+        scanf("%d", &n);
+
+        int arr[n];
+        printf("Enter the elements of the array: ");
+        for (int i = 0; i < n; i++) {
+            scanf("%d", &arr[i]);
+        }
+
+        printf("Enter the window size (k): ");
+        scanf("%d", &k);
+
+        if (containsDuplicate(arr, n, k)) {
+            printf("Duplicate present in window %d\n", k);
+        } else {
+            printf("Duplicate not present in window %d\n", k);
+        }
+        printf("\n");
+    }
+
+    return 0;
+}
