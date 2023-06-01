@@ -1,0 +1,39 @@
+#include <stdio.h>
+#include <stdbool.h>
+
+void findPairs(int arr[], int n) {
+    bool found = false;
+
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = i + 1; j < n; j++) {
+            for (int k = 0; k < n - 1; k++) {
+                for (int l = k + 1; l < n; l++) {
+                    if (arr[i] * arr[j] == arr[k] * arr[l]) {
+                        printf("Pair (%d, %d) and Pair (%d, %d) found\n", arr[i], arr[j], arr[k], arr[l]);
+                        found = true;
+                    }
+                }
+            }
+        }
+    }
+
+    if (!found) {
+        printf("No such pairs exist.\n");
+    }
+}
+
+int main() {
+    int n;
+    printf("Enter the size of the array: ");
+    scanf("%d", &n);
+
+    int arr[n];
+    printf("Enter the elements of the array: ");
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &arr[i]);
+    }
+
+    findPairs(arr, n);
+
+    return 0;
+}
