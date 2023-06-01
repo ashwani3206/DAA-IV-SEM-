@@ -1,0 +1,77 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Function to swap two elements in an array
+void swap(int* a, int* b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+// Function to sort the array in non-decreasing order using bubble sort
+void sortArray(int arr[], int n) {
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            if (arr[j] > arr[j + 1]) {
+                swap(&arr[j], &arr[j + 1]);
+            }
+        }
+    }
+}
+
+// Function to find the majority element in the sorted array
+int findMajorityElement(int arr[], int n) {
+    int count = 1;
+    int maxCount = 0;
+    int majorityElement = 0;
+
+    for (int i = 1; i < n; i++) {
+        if (arr[i] == arr[i - 1]) {
+            count++;
+        } else {
+            count = 1;
+        }
+
+        if (count > maxCount) {
+            maxCount = count;
+            majorityElement = arr[i];
+        }
+    }
+
+    return majorityElement;
+}
+
+// Function to find the median of the sorted array
+float findMedian(int arr[], int n) {
+    if (n % 2 == 0) {
+        return (float)(arr[n / 2 - 1] + arr[n / 2]) / 2.0;
+    } else {
+        return arr[n / 2];
+    }
+}
+
+int main() {
+    int n;
+    printf("Enter the size of the array: ");
+    scanf("%d", &n);
+
+    int arr[n];
+    printf("Enter the elements of the array: ");
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &arr[i]);
+    }
+
+    sortArray(arr, n);
+
+    int majorityElement = findMajorityElement(arr, n);
+    if (majorityElement != 0) {
+        printf("yes\n");
+    } else {
+        printf("no\n");
+    }
+
+    float median = findMedian(arr, n);
+    printf("Median: %.2f\n", median);
+
+    return 0;
+}
