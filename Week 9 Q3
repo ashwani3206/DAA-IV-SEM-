@@ -1,0 +1,128 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Structure to represent a min-heap node
+struct MinHeapNode {
+    int data;
+};
+
+// Structure to represent a min-heap
+struct MinHeap {
+    int size;
+    int capacity;
+    struct MinHeapNode* array;
+};
+
+// Function to create a new min-heap node
+struct MinHeapNode* createNode(int data) {
+    struct MinHeapNode* node = (struct MinHeapNode*)malloc(sizeof(struct MinHeapNode));
+    node->data = data;
+    return node;
+}
+
+// Function to create a new min-heap
+struct MinHeap* createMinHeap(int capacity) {
+    struct MinHeap* minHeap = (struct MinHeap*)malloc(sizeof(struct MinHeap));
+    minHeap->size = 0;
+    minHeap->capacity = capacity;
+    minHeap->array = (struct MinHeapNode*)malloc(capacity * sizeof(struct MinHeapNode));
+    return minHeap;
+}
+
+// Function to swap two min-heap nodes
+void swap(struct MinHeapNode** a, struct MinHeapNode** b) {
+    struct MinHeapNode* temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+// Function to heapify a min-heap
+void minHeapify(struct MinHeap* minHeap, int idx) {
+    int smallest = idx;
+    int left = 2 * idx + 1;
+    int right = 2 * idx + 2;
+
+    if (left < minHeap->size && minHeap->array[left].data < minHeap->array[smallest].data)
+        smallest = left;
+
+    if (right < minHeap->size && minHeap->array[right].data < minHeap->array[smallest].data)
+        smallest = right;
+
+    if (smallest != idx) {
+        swap(&minHeap->array[smallest], &minHeap->array[idx]);
+        minHeapify(minHeap, smallest);
+    }
+}
+
+// Function to check if a min-heap is empty
+int isEmpty(struct MinHeap* minHeap) {
+    return minHeap->size == 0;
+}
+
+// Function to extract the minimum element from a min-heap
+struct MinHeapNode* extractMin(struct MinHeap* minHeap) {
+    if (isEmpty(minHeap))
+        return NULL;
+
+    struct MinHeapNode* root = minHeap->array[0];
+    struct MinHeapNode* lastNode = minHeap->array[minHeap->size - 1];
+    minHeap->array[0] = lastNode;
+    minHeap->size--;
+    minHeapify(minHeap, 0);
+    return root;
+}
+
+// Function to insert a new element into a min-heap
+void insertMinHeap(struct MinHeap* minHeap, struct MinHeapNode* node) {
+    minHeap->size++;
+    int i = minHeap->size - 1;
+    while (i > 0 && node->data < minHeap->array[(i - 1) / 2].data) {
+        minHeap->array[i] = minHeap->array[(i - 1) / 2];
+        i = (i - 1) / 2;
+    }
+    minHeap->array[i] = *node;
+}
+
+// Function to compute the minimum computation cost to merge all files
+int mergeFiles(int arr[], int n) {
+    struct MinHeap* minHeap = createMinHeap(n);
+    for (int i = 0; i < n; i++) {
+        struct MinHeapNode* node = createNode(arr[i]);
+        insertMinHeap(minHeap, node);
+    }
+
+    int cost = 0;
+
+    while (minHeap->size > 1) {
+        struct MinHeapNode* smallest = extractMin(minHeap);
+        struct MinHeapNode* secondSmallest = extractMin(minHeap);
+
+        int mergeCost = smallest->data + secondSmallest->data;
+        cost += mergeCost;
+
+        struct MinHeapNode* mergeNode = createNode(mergeCost);
+        insertMinHeap(minHeap, mergeNode);
+    }
+
+    free(minHeap->array);
+    free(minHeap);
+
+    return cost;
+}
+
+int main() {
+    int n;
+    printf("Enter the size of the array: ");
+    scanf("%d", &n);
+
+    int arr[n];
+    printf("Enter the array elements: ");
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &arr[i]);
+    }
+
+    int minCost = mergeFiles(arr, n);
+    printf("Minimum computation cost required to merge all files: %d\n", minCost);
+
+    return 0;
+}
