@@ -1,0 +1,85 @@
+#include <stdio.h>
+#include <stdbool.h>
+#include <limits.h>
+
+#define MAX_CITIES 100
+
+// Structure to represent an edge
+struct Edge {
+    int u, v, weight;
+};
+
+// Function to find the minimum cost required to connect cities
+int minimum_cost(struct Edge graph[], int num_cities) {
+    int total_cost = 0;
+    bool visited[MAX_CITIES] = {false};
+    int min_weight[MAX_CITIES];
+    int parent[MAX_CITIES];
+
+    // Initialize min_weight array with a large value
+    for (int i = 0; i < num_cities; i++) {
+        min_weight[i] = INT_MAX;
+    }
+
+    // Start with the first city
+    int start_city = 0;
+    min_weight[start_city] = 0;
+    parent[start_city] = -1;
+
+    for (int count = 0; count < num_cities - 1; count++) {
+        int min_index = -1;
+        int min_value = INT_MAX;
+
+        // Find the city with the minimum weight
+        for (int i = 0; i < num_cities; i++) {
+            if (!visited[i] && min_weight[i] < min_value) {
+                min_index = i;
+                min_value = min_weight[i];
+            }
+        }
+
+        // Mark the selected city as visited
+        visited[min_index] = true;
+
+        // Update the minimum weight and parent for adjacent cities
+        for (int i = 0; i < num_cities; i++) {
+            if (!visited[i] && graph[i].weight < min_weight[i]) {
+                min_weight[i] = graph[i].weight;
+                parent[i] = min_index;
+            }
+        }
+    }
+
+    // Calculate the total cost
+    for (int i = 0; i < num_cities; i++) {
+        total_cost += graph[i].weight;
+    }
+
+    return total_cost;
+}
+
+int main() {
+    int num_cities;
+    printf("Enter the number of cities: ");
+    scanf("%d", &num_cities);
+
+    struct Edge graph[MAX_CITIES];
+
+    // Read the graph input
+    for (int i = 0; i < num_cities; i++) {
+        printf("Enter the number of roads connected to city %d: ", i + 1);
+        int num_roads;
+        scanf("%d", &num_roads);
+
+        for (int j = 0; j < num_roads; j++) {
+            printf("Enter the destination city and cost of road %d: ", j + 1);
+            scanf("%d %d", &graph[j].v, &graph[j].weight);
+            graph[j].u = i;
+        }
+    }
+
+    int minimum_budget = minimum_cost(graph, num_cities);
+    printf("Minimum budget required: %d\n", minimum_budget);
+
+    return 0;
+}
