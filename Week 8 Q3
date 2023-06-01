@@ -1,0 +1,40 @@
+import sys
+
+def prim_max_budget(graph, num_vertices):
+    key = [-sys.maxsize] * num_vertices
+    parent = [-1] * num_vertices
+    key[0] = 0
+    mst = set()
+
+    for _ in range(num_vertices):
+        max_key = -sys.maxsize
+        max_vertex = -1
+
+        for v in range(num_vertices):
+            if key[v] > max_key and v not in mst:
+                max_key = key[v]
+                max_vertex = v
+
+        mst.add(max_vertex)
+
+        for u in range(num_vertices):
+            if graph[max_vertex][u] > key[u] and u not in mst:
+                key[u] = graph[max_vertex][u]
+                parent[u] = max_vertex
+
+    max_budget = sum(graph[u][parent[u]] for u in range(1, num_vertices))
+
+    return max_budget
+
+# Example usage
+num_vertices = int(input("Enter the number of vertices: "))
+
+print("Enter the adjacency matrix:")
+
+graph = []
+for _ in range(num_vertices):
+    row = list(map(int, input().split()))
+    graph.append(row)
+
+max_budget = prim_max_budget(graph, num_vertices)
+print("Maximum budget required for the road construction project:", max_budget)
