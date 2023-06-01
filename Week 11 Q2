@@ -1,0 +1,40 @@
+#include <stdio.h>
+
+// Function to find the number of ways to make a sum using coins
+int countWays(int coins[], int numCoins, int N) {
+    int dp[N + 1];
+    dp[0] = 1;
+
+    for (int i = 1; i <= N; i++) {
+        dp[i] = 0;
+    }
+
+    for (int i = 0; i < numCoins; i++) {
+        for (int j = coins[i]; j <= N; j++) {
+            dp[j] += dp[j - coins[i]];
+        }
+    }
+
+    return dp[N];
+}
+
+int main() {
+    int numCoins;
+    printf("Enter the number of coins: ");
+    scanf("%d", &numCoins);
+
+    int coins[numCoins];
+    printf("Enter the values of the coins:\n");
+    for (int i = 0; i < numCoins; i++) {
+        scanf("%d", &coins[i]);
+    }
+
+    int N;
+    printf("Enter the target sum value: ");
+    scanf("%d", &N);
+
+    int ways = countWays(coins, numCoins, N);
+    printf("Number of ways to make sum %d: %d\n", N, ways);
+
+    return 0;
+}
