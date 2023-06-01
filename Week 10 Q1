@@ -1,0 +1,69 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Activity {
+    int index;
+    int start;
+    int finish;
+};
+
+// Function to compare activities based on finishing time
+int compareActivities(const void* a, const void* b) {
+    struct Activity* activityA = (struct Activity*)a;
+    struct Activity* activityB = (struct Activity*)b;
+    return activityA->finish - activityB->finish;
+}
+
+// Function to select non-conflicting activities
+void selectActivities(int start[], int finish[], int N) {
+    struct Activity activities[N];
+    for (int i = 0; i < N; i++) {
+        activities[i].index = i;
+        activities[i].start = start[i];
+        activities[i].finish = finish[i];
+    }
+
+    // Sort activities based on finishing time
+    qsort(activities, N, sizeof(struct Activity), compareActivities);
+
+    int selectedActivities[N];
+    int selectedCount = 0;
+
+    int prevFinish = activities[0].finish;
+    selectedActivities[selectedCount++] = activities[0].index;
+
+    for (int i = 1; i < N; i++) {
+        if (activities[i].start >= prevFinish) {
+            selectedActivities[selectedCount++] = activities[i].index;
+            prevFinish = activities[i].finish;
+        }
+    }
+
+    printf("Number of non-conflicting activities: %d\n", selectedCount);
+    printf("List of selected activities: ");
+    for (int i = 0; i < selectedCount; i++) {
+        printf("%d ", selectedActivities[i]);
+    }
+    printf("\n");
+}
+
+int main() {
+    int N;
+    printf("Enter the number of activities: ");
+    scanf("%d", &N);
+
+    int start[N], finish[N];
+    printf("Enter the starting time of activities: ");
+    for (int i = 0; i < N; i++) {
+        scanf("%d", &start[i]);
+    }
+
+    printf("Enter the finishing time of activities: ");
+    for (int i = 0; i < N; i++) {
+        scanf("%d", &finish[i]);
+    }
+
+    selectActivities(start, finish, N);
+
+    return 0;
+}
