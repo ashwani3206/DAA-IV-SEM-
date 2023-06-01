@@ -1,0 +1,74 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Item {
+    int value;
+    int weight;
+};
+
+// Function to compare items based on value/weight ratio
+int compareItems(const void* a, const void* b) {
+    struct Item* itemA = (struct Item*)a;
+    struct Item* itemB = (struct Item*)b;
+    double ratioA = (double)itemA->value / itemA->weight;
+    double ratioB = (double)itemB->value / itemB->weight;
+    if (ratioA < ratioB)
+        return 1;
+    else if (ratioA > ratioB)
+        return -1;
+    else
+        return 0;
+}
+
+// Function to find the maximum value of items that fit in the knapsack
+double fractionalKnapsack(int W, struct Item items[], int n) {
+    qsort(items, n, sizeof(struct Item), compareItems);
+
+    double totalValue = 0.0;
+    int currentWeight = 0;
+
+    for (int i = 0; i < n; i++) {
+        if (currentWeight + items[i].weight <= W) {
+            // Take the whole item
+            currentWeight += items[i].weight;
+            totalValue += items[i].value;
+        } else {
+            // Take a fraction of the item to fill the remaining capacity
+            int remainingWeight = W - currentWeight;
+            double fraction = (double)remainingWeight / items[i].weight;
+            totalValue += fraction * items[i].value;
+            break;
+        }
+    }
+
+    return totalValue;
+}
+
+int main() {
+    int maxCapacity;
+    printf("Enter the maximum capacity of the knapsack: ");
+    scanf("%d", &maxCapacity);
+
+    int numItems;
+    printf("Enter the number of items: ");
+    scanf("%d", &numItems);
+
+    struct Item* items = (struct Item*)malloc(numItems * sizeof(struct Item));
+
+    printf("Enter the value and weight of each item:\n");
+    for (int i = 0; i < numItems; i++) {
+        printf("Item %d:\n", i + 1);
+        printf("Value: ");
+        scanf("%d", &(items[i].value));
+        printf("Weight: ");
+        scanf("%d", &(items[i].weight));
+    }
+
+    double maxValue = fractionalKnapsack(maxCapacity, items, numItems);
+
+    printf("Maximum value that can be carried: %.2f\n", maxValue);
+
+    free(items);
+
+    return 0;
+}
