@@ -1,0 +1,59 @@
+#include <stdio.h>
+#include <stdbool.h>
+
+// Function to check if a set can be partitioned into two subsets with equal sums
+bool canPartition(int set[], int n) {
+    int totalSum = 0;
+    for (int i = 0; i < n; i++) {
+        totalSum += set[i];
+    }
+
+    if (totalSum % 2 != 0) {
+        return false; // If total sum is odd, cannot divide into two equal-sum subsets
+    }
+
+    int targetSum = totalSum / 2;
+    bool dp[n + 1][targetSum + 1];
+
+    // Initialize the first column to true and the first row to false
+    for (int i = 0; i <= n; i++) {
+        dp[i][0] = true;
+    }
+    for (int i = 1; i <= targetSum; i++) {
+        dp[0][i] = false;
+    }
+
+    // Perform dynamic programming to fill the dp[][] array
+    for (int i = 1; i <= n; i++) {
+        for (int j = 1; j <= targetSum; j++) {
+            if (set[i - 1] > j) {
+                dp[i][j] = dp[i - 1][j];
+            } else {
+                dp[i][j] = dp[i - 1][j] || dp[i - 1][j - set[i - 1]];
+            }
+        }
+    }
+
+    return dp[n][targetSum];
+}
+
+int main() {
+    int n;
+    printf("Enter the number of elements: ");
+    scanf("%d", &n);
+
+    int set[n];
+    printf("Enter the elements of the set:\n");
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &set[i]);
+    }
+
+    bool result = canPartition(set, n);
+    if (result) {
+        printf("Yes\n");
+    } else {
+        printf("No\n");
+    }
+
+    return 0;
+}
