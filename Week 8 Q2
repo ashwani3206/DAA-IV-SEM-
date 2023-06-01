@@ -1,0 +1,111 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+#define MAX_VERTICES 100
+#define MAX_EDGES 10000
+
+// Structure to represent an edge
+struct Edge {
+    int src, dest, weight;
+};
+
+// Structure to represent a subset for union-find
+struct Subset {
+    int parent;
+    int rank;
+};
+
+// Function to compare two edges based on their weights
+int compareEdges(const void* a, const void* b) {
+    struct Edge* edgeA = (struct Edge*)a;
+    struct Edge* edgeB = (struct Edge*)b;
+    return edgeA->weight - edgeB->weight;
+}
+
+// Find the parent of a vertex using path compression
+int find(struct Subset subsets[], int vertex) {
+    if (subsets[vertex].parent != vertex) {
+        subsets[vertex].parent = find(subsets, subsets[vertex].parent);
+    }
+    return subsets[vertex].parent;
+}
+
+// Perform union of two subsets by rank
+void unionSet(struct Subset subsets[], int x, int y) {
+    int xRoot = find(subsets, x);
+    int yRoot = find(subsets, y);
+
+    if (subsets[xRoot].rank < subsets[yRoot].rank) {
+        subsets[xRoot].parent = yRoot;
+    } else if (subsets[xRoot].rank > subsets[yRoot].rank) {
+        subsets[yRoot].parent = xRoot;
+    } else {
+        subsets[yRoot].parent = xRoot;
+        subsets[xRoot].rank++;
+    }
+}
+
+// Function to find the minimum spanning weight using Kruskal's algorithm
+int minimum_spanning_weight(struct Edge edges[], int num_vertices, int num_edges) {
+    struct Subset subsets[MAX_VERTICES];
+    int weight = 0;
+
+    // Sort edges in non-decreasing order by weight
+    qsort(edges, num_edges, sizeof(struct Edge), compareEdges);
+
+    // Create subsets with single elements
+    for (int v = 0; v < num_vertices; v++) {
+        subsets[v].parent = v;
+        subsets[v].rank = 0;
+    }
+
+    int edgeCount = 0;
+    int i = 0;
+
+    while (edgeCount < num_vertices - 1 && i < num_edges) {
+        struct Edge currentEdge = edges[i++];
+
+        int x = find(subsets, currentEdge.src);
+        int y = find(subsets, currentEdge.dest);
+
+        // Include the edge in the MST if it doesn't create a cycle
+        if (x != y) {
+            unionSet(subsets, x, y);
+            weight += currentEdge.weight;
+            edgeCount++;
+        }
+    }
+
+    return weight;
+}
+
+int main() {
+    int num_vertices;
+    printf("Enter the number of vertices in the graph: ");
+    scanf("%d", &num_vertices);
+
+    struct Edge edges[MAX_EDGES];
+    int num_edges = 0;
+
+    // Read the graph input
+    for (int i = 0; i < num_vertices; i++) {
+        for (int j = 0; j < num_vertices; j++) {
+            int weight;
+            printf("Enter the weight of edge (%d, %d): ", i, j);
+            scanf("%d", &weight);
+
+            if (weight != 0) {
+                edges[num_edges].src = i;
+                edges[num_edges].dest = j;
+                edges[num_edges].weight = weight;
+                num_edges++;
+            }
+        }
+    }
+
+    int minimum_weight = minimum_spanning_weight(edges, num_vertices, num_edges);
+    printf("Minimum spanning weight: %d\n", minimum_weight);
+
+    return 0;
+}
