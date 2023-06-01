@@ -1,0 +1,53 @@
+#include <stdio.h>
+#include <string.h>
+
+int max(int a, int b) {
+    return (a > b) ? a : b;
+}
+
+int longest_common_subsequence(char sequence1[], char sequence2[]) {
+    int m = strlen(sequence1);
+    int n = strlen(sequence2);
+
+    int dp[m + 1][n + 1];
+
+    // Initialize the first row and column with 0
+    for (int i = 0; i <= m; i++) {
+        for (int j = 0; j <= n; j++) {
+            if (i == 0 || j == 0)
+                dp[i][j] = 0;
+        }
+    }
+
+    // Fill the dp array
+    for (int i = 1; i <= m; i++) {
+        for (int j = 1; j <= n; j++) {
+            if (sequence1[i - 1] == sequence2[j - 1])
+                dp[i][j] = dp[i - 1][j - 1] + 1;
+            else
+                dp[i][j] = max(dp[i - 1][j], dp[i][j - 1]);
+        }
+    }
+
+    // Length of the longest common subsequence
+    int lcs_length = dp[m][n];
+    return lcs_length;
+}
+
+int main() {
+    char sequence1[100];
+    char sequence2[100];
+
+    printf("Enter the first sequence: ");
+    fgets(sequence1, sizeof(sequence1), stdin);
+    sequence1[strcspn(sequence1, "\n")] = '\0';
+
+    printf("Enter the second sequence: ");
+    fgets(sequence2, sizeof(sequence2), stdin);
+    sequence2[strcspn(sequence2, "\n")] = '\0';
+
+    int length = longest_common_subsequence(sequence1, sequence2);
+    printf("Length of the longest common subsequence: %d\n", length);
+
+    return 0;
+}
