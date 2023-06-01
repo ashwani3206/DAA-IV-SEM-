@@ -1,0 +1,68 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Task {
+    int index;
+    int time;
+    int deadline;
+};
+
+// Function to compare tasks based on deadlines
+int compareTasks(const void* a, const void* b) {
+    struct Task* taskA = (struct Task*)a;
+    struct Task* taskB = (struct Task*)b;
+    return taskA->deadline - taskB->deadline;
+}
+
+// Function to select tasks without crossing deadlines
+void selectTasks(int time[], int deadline[], int n) {
+    struct Task tasks[n];
+    for (int i = 0; i < n; i++) {
+        tasks[i].index = i;
+        tasks[i].time = time[i];
+        tasks[i].deadline = deadline[i];
+    }
+
+    // Sort tasks based on deadlines
+    qsort(tasks, n, sizeof(struct Task), compareTasks);
+
+    int selectedTasks[n];
+    int selectedCount = 0;
+
+    int currentTime = 0;
+
+    for (int i = 0; i < n; i++) {
+        if (currentTime + tasks[i].time <= tasks[i].deadline) {
+            selectedTasks[selectedCount++] = tasks[i].index;
+            currentTime += tasks[i].time;
+        }
+    }
+
+    printf("Total number of selected tasks: %d\n", selectedCount);
+    printf("List of selected task indices: ");
+    for (int i = 0; i < selectedCount; i++) {
+        printf("%d ", selectedTasks[i]);
+    }
+    printf("\n");
+}
+
+int main() {
+    int n;
+    printf("Enter the total number of tasks: ");
+    scanf("%d", &n);
+
+    int time[n], deadline[n];
+    printf("Enter the time taken for each task: ");
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &time[i]);
+    }
+
+    printf("Enter the deadlines for each task: ");
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &deadline[i]);
+    }
+
+    selectTasks(time, deadline, n);
+
+    return 0;
+}
